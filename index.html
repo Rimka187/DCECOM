@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1e3a8a">
+<title>DCE DAHARI — AMP Anjouan</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f4f8;font-family:'Segoe UI',sans-serif;font-size:15px;color:#1e293b}
+.screen{display:none;padding:16px;min-height:100vh}
+.screen.active{display:block}
+.header{background:#1e3a8a;color:white;padding:16px;text-align:center;border-radius:10px;margin-bottom:18px}
+.header h1{font-size:18px;line-height:1.3}
+.header h2{font-size:16px;line-height:1.3}
+.card{background:white;border-radius:12px;padding:18px;box-shadow:0 4px 12px rgba(0,0,0,0.08);margin-bottom:14px}
+.btn{width:100%;padding:14px;font-size:15px;font-weight:600;border:none;border-radius:8px;cursor:pointer;margin-top:8px}
+.btn-primary{background:#1e3a8a;color:white}
+.btn-success{background:#10b981;color:white}
+.btn-default{background:#e2e8f0;color:#1e293b}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+label{display:block;margin:6px 0 2px;font-weight:500}
+input[type=text],input[type=number],select,textarea{width:100%;padding:10px;border:1.5px solid #cbd5e1;border-radius:6px;font-size:14px;margin-bottom:6px}
+textarea{resize:vertical;min-height:80px}
+.radio-group label, .check-group label{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;margin-bottom:5px;cursor:pointer;font-weight:400}
+.radio-group input[type=radio], .check-group input[type=checkbox]{width:18px;height:18px;accent-color:#1e3a8a;flex-shrink:0}
+.radio-group label.selected,.check-group label.checked{border-color:#1e3a8a;background:#eff6ff}
+.q-num{font-size:13px;font-weight:700;color:#1e3a8a;margin-top:16px;margin-bottom:4px}
+.q-text{font-size:14px;font-weight:600;color:#1e293b;margin-bottom:8px}
+.q-note{font-size:12px;color:#64748b;font-style:italic;margin-bottom:8px}
+.hidden{display:none!important}
+/* Progress bar */
+.progress-wrap{background:#e2e8f0;border-radius:10px;height:22px;overflow:hidden;margin-bottom:14px}
+.progress-bar{height:100%;background:#10b981;transition:width .3s;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700}
+/* DCE cards */
+.cartes-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+@media(max-width:600px){.cartes-row{grid-template-columns:1fr}}
+.carte{border:3px solid #e2e8f0;border-radius:12px;padding:12px;cursor:pointer;background:white;transition:.2s;min-height:340px}
+.carte:active{transform:scale(.98)}
+.carte.selected{border-color:#10b981;background:#f0fdf4;box-shadow:0 0 16px rgba(16,185,129,.3)}
+.carte.opt-out{border-color:#ef4444;background:#fff5f5}
+.carte.opt-out.selected{border-color:#ef4444;background:#fee2e2;box-shadow:0 0 16px rgba(239,68,68,.25)}
+.opt-out-inner{text-align:center;padding:40px 10px}
+.opt-out-inner .big-icon{font-size:44px;display:block;margin-bottom:10px}
+.opt-out-inner h4{color:#b91c1c;font-size:15px}
+.opt-out-inner p{color:#64748b;font-size:13px;margin-top:8px;font-style:italic}
+.alt-title{text-align:center;font-weight:700;color:#1e3a8a;margin-bottom:10px;font-size:14px}
+.attr-block{border-left:4px solid #3b82f6;background:#f8fafc;border-radius:4px;padding:7px;margin-bottom:7px}
+.attr-name{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:2px}
+.attr-img{width:100%;height:90px;object-fit:contain;background:#f1f5f9;border-radius:3px;margin:4px 0;display:block}
+.attr-val{font-size:13px;font-weight:600;color:#1e293b}
+/* OptOut follow-up */
+.optout-followup{background:#fff5f5;border-left:5px solid #ef4444;border-radius:6px;padding:14px;margin-bottom:10px}
+.optout-followup h4{color:#b91c1c;margin-bottom:8px;font-size:14px}
+/* Consent box */
+.consent-box{background:#fff3cd;padding:16px;border-left:5px solid #ffc107;border-radius:6px;margin-bottom:14px}
+.consent-box label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:500;font-size:14px}
+.consent-box input[type=checkbox]{width:20px;height:20px;margin-top:2px;flex-shrink:0}
+/* Info block */
+.info-box{background:#eff6ff;padding:14px;border-left:5px solid #3b82f6;border-radius:6px;margin-bottom:14px;font-size:13px;text-align:justify;line-height:1.6}
+/* Gouvernance */
+.likert-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:10px}
+.likert-item .q-text{font-size:13px;margin-bottom:8px}
+.likert-row{display:flex;flex-wrap:wrap;gap:5px}
+.likert-row label{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;text-align:center;flex:1;min-width:70px}
+.likert-row label.selected{border-color:#1e3a8a;background:#eff6ff;color:#1e3a8a}
+.likert-row input[type=radio]{width:16px;height:16px;accent-color:#1e3a8a}
+/* Merci */
+.merci-box{text-align:center;padding:30px 0}
+.merci-box .big-check{font-size:64px;margin-bottom:14px}
+.merci-box h3{color:#10b981;font-size:20px;margin-bottom:10px}
+/* Notification */
+#notif{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:9999;background:#ef4444;color:white;padding:10px 18px;border-radius:8px;font-size:13px;display:none;max-width:90%;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.logo-wrap{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+.logo-wrap img{height:44px}
+.section-sep{border:none;border-top:2px solid #e2e8f0;margin:16px 0}
+</style>
+</head>
+<body>
+<div id="notif"></div>
+
+<!-- ============================================================ ÉCRAN 1 : INTRO -->
+<div id="s-intro" class="screen active">
+  <div class="header">
+    <div class="logo-wrap">
+      <img src="images/DAHARI.png" onerror="this.style.display='none'" alt="DAHARI">
+    </div>
+    <h1>DCE DAHARI — Enquête AMP Anjouan</h1>
+  </div>
+  <div class="card">
+    <h4 style="color:#1e3a8a;margin-bottom:10px">Introduction</h4>
+    <p style="font-size:13px;line-height:1.7;text-align:justify">
+      Bonjour, je suis <em>« nom de l'enquêteur »</em> et je participe à un projet de recherche
+      scientifique dans lequel nous nous intéressons à la perception des mesures de gouvernance
+      et de co-construction des initiatives de conservation des ressources marines (réserves
+      permanentes) à Anjouan. Le projet est mené en collaboration avec des chercheurs de
+      l'INRAE en France et l'équipe de DAHARI. Nous souhaitons vous poser des questions sur
+      les initiatives de conservation mises en place, ainsi que sur la pêche. L'entretien
+      comporte plusieurs parties : quelques questions générales sur vous et votre ménage,
+      des questions sur vos activités de pêche, un exercice où l'on vous demandera de choisir
+      entre différentes options hypothétiques de mesure de conservation, ainsi que quelques
+      questions sur votre opinion concernant la gestion des ressources marines.
+      L'entretien dure environ <strong>40 minutes</strong>. Vous êtes libre de refuser de
+      répondre à certaines questions si vous le souhaitez et de mettre fin à cet entretien à
+      tout moment. Vos réponses sont totalement anonymes.
+    </p>
+    <p style="font-size:12px;color:#64748b;font-style:italic;margin-top:8px">Les données seront utilisées uniquement à des fins de recherche scientifique.</p>
+  </div>
+  <div class="consent-box">
+    <label>
+      <input type="checkbox" id="consent">
+      <span>J'ai lu et compris ces informations et j'accepte volontairement de participer à cette enquête.</span>
+    </label>
+  </div>
+  <button class="btn btn-primary" id="btn-intro-go" disabled>Commencer l'enquête →</button>
+</div>
+
+<!-- ============================================================ ÉCRAN 2 : SOCIODEM -->
+<div id="s-sociodem" class="screen">
+  <div class="header"><h2>Caractéristiques sociodémographiques</h2></div>
+  <div class="card">
+    <label>Nom de l'enquêteur :</label>
+    <input type="text" id="enqueteur" placeholder="Entrez le nom">
+    <label>ID pêcheur :</label>
+    <input type="text" id="pecheur" placeholder="Identifiant unique">
+    <hr class="section-sep">
+
+    <div class="q-num">Q1. Dans quel village résidez-vous actuellement ?</div>
+    <select id="village">
+      <option value="">— Choisir le village —</option>
+      <option value="1">Vassy</option><option value="2">Dzindri</option>
+      <option value="3">Imere</option><option value="4">Salamani</option>
+      <option value="5">Dar Salama</option><option value="6">Bandrani Vouani</option>
+      <option value="7">Chirove</option><option value="8">Hamabawa</option>
+      <option value="9">Moya</option><option value="10">Maweni</option>
+      <option value="11">Marontroni</option><option value="12">Bikini</option>
+      <option value="13">Kowé</option><option value="14">Nindri</option>
+      <option value="15">Vouani</option>
+    </select>
+
+    <div class="q-num">Q2. Quel est votre âge ?</div>
+    <div class="q-note">Réponse en nombre d'années.</div>
+    <input type="number" id="age" min="15" max="100" placeholder="ex: 35">
+
+    <div class="q-num">Q3. Quel est votre genre ?</div>
+    <div class="radio-group" id="rg-genre">
+      <label><input type="radio" name="genre" value="1"> Femme</label>
+      <label><input type="radio" name="genre" value="2"> Homme</label>
+    </div>
+
+    <div class="q-num">Q4. Quel est le niveau le plus élevé que vous avez atteint à l'école ?</div>
+    <div class="radio-group" id="rg-education">
+      <label><input type="radio" name="education" value="1"> Aucun</label>
+      <label><input type="radio" name="education" value="2"> École coranique (madrassa)</label>
+      <label><input type="radio" name="education" value="3"> Primaire</label>
+      <label><input type="radio" name="education" value="4"> Secondaire</label>
+      <label><input type="radio" name="education" value="5"> Université</label>
+    </div>
+
+    <div class="q-num">Q5. Combien de personnes vivent habituellement dans votre ménage ?</div>
+    <div class="q-note">Comptez toutes les personnes vivant habituellement dans votre ménage, y compris vous-même.</div>
+    <input type="number" id="taille_menage" min="1" max="50" placeholder="ex: 5">
+
+    <div class="q-num">Q6. Quelle est votre principale activité ?</div>
+    <div class="q-note">Une seule réponse.</div>
+    <div class="radio-group" id="rg-act-princ">
+      <label><input type="radio" name="activite_principale" value="1"> Pêche</label>
+      <label><input type="radio" name="activite_principale" value="2"> Agriculture</label>
+      <label><input type="radio" name="activite_principale" value="3"> Élevage</label>
+      <label><input type="radio" name="activite_principale" value="4"> Commerce</label>
+      <label><input type="radio" name="activite_principale" value="5"> Transport (taxi, bateau)</label>
+      <label><input type="radio" name="activite_principale" value="6"> Autre</label>
+    </div>
+    <div id="act-princ-autre-wrap" class="hidden">
+      <input type="text" id="activite_principale_autre" placeholder="Précisez :">
+    </div>
+
+    <div class="q-num">Q7. Quelle est votre activité secondaire ?</div>
+    <div class="q-note">Une seule réponse.</div>
+    <div class="radio-group" id="rg-act-sec">
+      <label><input type="radio" name="activite_secondaire" value="1"> Pêche</label>
+      <label><input type="radio" name="activite_secondaire" value="2"> Agriculture</label>
+      <label><input type="radio" name="activite_secondaire" value="3"> Élevage</label>
+      <label><input type="radio" name="activite_secondaire" value="4"> Commerce</label>
+      <label><input type="radio" name="activite_secondaire" value="5"> Transport (taxi, bateau)</label>
+      <label><input type="radio" name="activite_secondaire" value="6"> Autre</label>
+      <label><input type="radio" name="activite_secondaire" value="0"> Aucune activité secondaire</label>
+    </div>
+    <div id="act-sec-autre-wrap" class="hidden">
+      <input type="text" id="activite_secondaire_autre" placeholder="Précisez :">
+    </div>
+
+    <div class="q-num">Q8. Quel(s) type(s) de pêche pratiquez-vous ?</div>
+    <div class="q-note">Plusieurs réponses possibles.</div>
+    <div class="check-group" id="cg-type-peche">
+      <label><input type="checkbox" value="1"> Pêche à pied</label>
+      <label><input type="checkbox" value="2"> Pêche au filet</label>
+      <label><input type="checkbox" value="3"> Pêche en pirogue</label>
+      <label><input type="checkbox" value="4"> Pêche à la vedette</label>
+      <label><input type="checkbox" value="5"> Autre</label>
+    </div>
+    <div id="type-peche-autre-wrap" class="hidden">
+      <input type="text" id="type_peche_autre" placeholder="Précisez :">
+    </div>
+
+    <div class="q-num">Q9. Quelle(s) technique(s) de pêche utilisez-vous ?</div>
+    <div class="q-note">Plusieurs réponses possibles.</div>
+    <div class="check-group" id="cg-techniques">
+      <label><input type="checkbox" value="1"> Misi « pêche à la ligne »</label>
+      <label><input type="checkbox" value="2"> Ntsontso « harpon en fer »</label>
+      <label><input type="checkbox" value="3"> Mwiri « harpon en bois »</label>
+      <label><input type="checkbox" value="4"> Plongeur / Bunduki « fusil harpon »</label>
+      <label><input type="checkbox" value="5"> Gnavu « pêche au filet »</label>
+      <label><input type="checkbox" value="6"> Dema « pêche à la nasse »</label>
+      <label><input type="checkbox" value="7"> Coupe-coupe « pêche à la machette »</label>
+      <label><input type="checkbox" value="8"> Uruva « poison »</label>
+      <label><input type="checkbox" value="9"> Autre</label>
+    </div>
+    <div id="techniques-autre-wrap" class="hidden">
+      <input type="text" id="techniques_peche_autre" placeholder="Précisez :">
+    </div>
+
+    <div class="q-num">Q10. Dans quelles zones pêchez-vous habituellement ?</div>
+    <div class="q-note">Plusieurs réponses possibles.</div>
+    <div class="check-group" id="cg-zones">
+      <label><input type="checkbox" value="1"> Platier</label>
+      <label><input type="checkbox" value="2"> Crête</label>
+      <label><input type="checkbox" value="3"> Au large</label>
+      <label><input type="checkbox" value="4"> Autre</label>
+    </div>
+    <div id="zones-autre-wrap" class="hidden">
+      <input type="text" id="zones_peche_autre" placeholder="Précisez :">
+    </div>
+
+    <div class="q-num">Q11. Quelle est votre zone de pêche principale ?</div>
+    <div class="q-note">Une seule réponse.</div>
+    <div class="radio-group" id="rg-zone-princ">
+      <label><input type="radio" name="zone_principale" value="1"> Platier</label>
+      <label><input type="radio" name="zone_principale" value="2"> Crête</label>
+      <label><input type="radio" name="zone_principale" value="3"> Au large</label>
+      <label><input type="radio" name="zone_principale" value="4"> Autre</label>
+    </div>
+    <div id="zone-princ-autre-wrap" class="hidden">
+      <input type="text" id="zone_principale_autre" placeholder="Précisez :">
+    </div>
+
+    <button class="btn btn-success" id="btn-sociodem-go" style="margin-top:20px">Continuer →</button>
+  </div>
+</div>
+
+<!-- ============================================================ ÉCRAN 3 : CONNAISSANCE -->
+<div id="s-connaissance" class="screen">
+  <div class="header"><h2>Connaissance des initiatives de conservation</h2></div>
+  <div class="info-box">
+    <p>Depuis plusieurs années, différentes mesures ont été mises en place à Anjouan pour protéger
+    les ressources marines et les récifs coralliens. Ces mesures incluent notamment la création
+    d'aires marines protégées, comme celle de Sishiwani par l'État comorien, ou les réserves de
+    Vassy et de Moya-Kowé par l'ONG Dahari. En plus de ces activités de conservation, il en existe
+    d'autres, comme la restriction de l'usage de certains matériels de pêche (filets, poison « uruva »).</p>
+    <p style="margin-top:6px">Ces initiatives sont généralement mises en œuvre avec l'implication de
+    plusieurs acteurs : les associations de pêcheurs, des organisations non gouvernementales (comme
+    Dahari), ainsi que les autorités locales et nationales.</p>
+    <p style="margin-top:6px"><strong>Les questions suivantes portent sur vos connaissances
+    concernant ces initiatives de conservation marine.</strong></p>
+  </div>
+  <div class="card">
+    <div class="q-num">Q12. Avant aujourd'hui, aviez-vous connaissance des activités menées par Dahari dans votre village ?</div>
+    <div class="radio-group" id="rg-connait-dahari">
+      <label><input type="radio" name="connait_dahari" value="1"> Oui</label>
+      <label><input type="radio" name="connait_dahari" value="0"> Non</label>
+      <label><input type="radio" name="connait_dahari" value="99"> Je préfère ne pas répondre</label>
+    </div>
+
+    <div class="q-num">Q13. Avez-vous déjà été impliqué ou participé à une des activités de Dahari ?</div>
+    <div class="radio-group" id="rg-participe-dahari">
+      <label><input type="radio" name="participe_dahari" value="1"> Oui</label>
+      <label><input type="radio" name="participe_dahari" value="0"> Non</label>
+      <label><input type="radio" name="participe_dahari" value="99"> Je préfère ne pas répondre</label>
+    </div>
+
+    <div class="q-num">Q14. Connaissez-vous une ou plusieurs associations ou organisations impliquées dans la gestion de la pêche dans votre village ?</div>
+    <div class="radio-group" id="rg-connait-assoc">
+      <label><input type="radio" name="connait_assoc" value="1"> Oui</label>
+      <label><input type="radio" name="connait_assoc" value="0"> Non</label>
+      <label><input type="radio" name="connait_assoc" value="99"> Je préfère ne pas répondre</label>
+    </div>
+    <div id="assoc-detail" class="hidden" style="margin-left:14px;margin-top:6px">
+      <p style="font-weight:600;font-size:13px;margin-bottom:6px">Lesquelles ? <em>(plusieurs réponses possibles)</em></p>
+      <div class="check-group" id="cg-associations">
+        <label><input type="checkbox" value="1"> Swiofish</label>
+        <label><input type="checkbox" value="2"> Syndicat des pêcheurs d'Anjouan (SPA)</label>
+        <label><input type="checkbox" value="3"> Comité de gestion de la pêche de Shitsangasheli</label>
+        <label><input type="checkbox" value="4"> Maecha Bora</label>
+        <label><input type="checkbox" value="5"> Malezi Mema</label>
+        <label><input type="checkbox" value="6"> Fikira Ndjema</label>
+        <label><input type="checkbox" value="7"> Nwama Ndjema Kowé</label>
+        <label><input type="checkbox" value="8"> Coopérative des pêcheurs de Moya</label>
+        <label><input type="checkbox" value="9"> Association des pêcheurs Mawéni-nkangani</label>
+        <label><input type="checkbox" value="10"> Reefish</label>
+        <label><input type="checkbox" value="11"> Coresud</label>
+        <label><input type="checkbox" value="12"> Autre</label>
+      </div>
+      <div id="assoc-autre-wrap" class="hidden">
+        <input type="text" id="associations_autre" placeholder="Précisez :">
+      </div>
+    </div>
+
+    <div class="q-num">Q15. Avez-vous connaissance de projets ou associations offrant une aide matérielle ou financière aux pêcheurs de votre village, au cours des cinq dernières années ?</div>
+    <div class="radio-group" id="rg-connait-aide">
+      <label><input type="radio" name="connait_aide" value="1"> Oui</label>
+      <label><input type="radio" name="connait_aide" value="0"> Non</label>
+      <label><input type="radio" name="connait_aide" value="99"> Je préfère ne pas répondre</label>
+    </div>
+
+    <div class="q-num">Q16. Au cours des cinq dernières années, avez-vous reçu une aide matérielle ou financière dans le cadre d'un projet, d'un programme public, d'une ONG ou d'une association ?</div>
+    <div class="radio-group" id="rg-aide-recue">
+      <label><input type="radio" name="aide_recue" value="1"> Oui</label>
+      <label><input type="radio" name="aide_recue" value="0"> Non</label>
+      <label><input type="radio" name="aide_recue" value="99"> Je préfère ne pas répondre</label>
+    </div>
+
+    <div id="aide-detail" class="hidden">
+      <div style="margin-left:14px;margin-top:8px">
+        <p style="font-weight:600;font-size:13px;margin-bottom:6px">Quels types d'aide avez-vous reçus ? <em>(plusieurs réponses possibles ; indiquez la source)</em></p>
+        <div class="check-group" id="cg-aides-types">
+          <label><input type="checkbox" value="1"> Appui en agriculture / maraîchage</label>
+          <label><input type="checkbox" value="2"> Formation en technique de séchage</label>
+          <label><input type="checkbox" value="3"> Don de réfrigérateur / chambre froide</label>
+          <label><input type="checkbox" value="4"> Don d'argent</label>
+          <label><input type="checkbox" value="5"> Autre</label>
+        </div>
+        <div id="aides-autre-wrap" class="hidden">
+          <input type="text" id="aides_types_autre" placeholder="Précisez :">
+        </div>
+        <!-- Source par type d'aide -->
+        <div id="source-aide-1" class="hidden" style="background:#f8fafc;padding:8px;border-radius:6px;margin-bottom:6px">
+          <p style="font-size:12px;font-weight:600;margin-bottom:4px">Source : Appui en agriculture / maraîchage</p>
+          <div class="radio-group" id="rg-src-1">
+            <label><input type="radio" name="source_aide_1" value="1"> Dahari</label>
+            <label><input type="radio" name="source_aide_1" value="2"> Autres</label>
+            <label><input type="radio" name="source_aide_1" value="3"> Les deux</label>
+          </div>
+        </div>
+        <div id="source-aide-2" class="hidden" style="background:#f8fafc;padding:8px;border-radius:6px;margin-bottom:6px">
+          <p style="font-size:12px;font-weight:600;margin-bottom:4px">Source : Formation en technique de séchage</p>
+          <div class="radio-group" id="rg-src-2">
+            <label><input type="radio" name="source_aide_2" value="1"> Dahari</label>
+            <label><input type="radio" name="source_aide_2" value="2"> Autres</label>
+            <label><input type="radio" name="source_aide_2" value="3"> Les deux</label>
+          </div>
+        </div>
+        <div id="source-aide-3" class="hidden" style="background:#f8fafc;padding:8px;border-radius:6px;margin-bottom:6px">
+          <p style="font-size:12px;font-weight:600;margin-bottom:4px">Source : Don de réfrigérateur / chambre froide</p>
+          <div class="radio-group" id="rg-src-3">
+            <label><input type="radio" name="source_aide_3" value="1"> Dahari</label>
+            <label><input type="radio" name="source_aide_3" value="2"> Autres</label>
+            <label><input type="radio" name="source_aide_3" value="3"> Les deux</label>
+          </div>
+        </div>
+        <div id="source-aide-4" class="hidden" style="background:#f8fafc;padding:8px;border-radius:6px;margin-bottom:6px">
+          <p style="font-size:12px;font-weight:600;margin-bottom:4px">Source : Don d'argent</p>
+          <div class="radio-group" id="rg-src-4">
+            <label><input type="radio" name="source_aide_4" value="1"> Dahari</label>
+            <label><input type="radio" name="source_aide_4" value="2"> Autres</label>
+            <label><input type="radio" name="source_aide_4" value="3"> Les deux</label>
+          </div>
+        </div>
+        <div id="source-aide-5" class="hidden" style="background:#f8fafc;padding:8px;border-radius:6px;margin-bottom:6px">
+          <p style="font-size:12px;font-weight:600;margin-bottom:4px">Source : Autre aide</p>
+          <div class="radio-group" id="rg-src-5">
+            <label><input type="radio" name="source_aide_5" value="1"> Dahari</label>
+            <label><input type="radio" name="source_aide_5" value="2"> Autres</label>
+            <label><input type="radio" name="source_aide_5" value="3"> Les deux</label>
+          </div>
+        </div>
+
+        <div class="q-num">Q17. Quand avez-vous reçu une aide pour la dernière fois ?</div>
+        <div class="radio-group" id="rg-derniere-aide">
+          <label><input type="radio" name="derniere_aide" value="1"> Au cours des 12 derniers mois</label>
+          <label><input type="radio" name="derniere_aide" value="2"> Il y a 1 à 2 ans</label>
+          <label><input type="radio" name="derniere_aide" value="3"> Il y a 2 à 5 ans</label>
+          <label><input type="radio" name="derniere_aide" value="4"> Plus de 5 ans</label>
+        </div>
+
+        <div class="q-num">Q18. Cette aide a-t-elle également bénéficié à d'autres personnes ou groupements ?</div>
+        <div class="radio-group" id="rg-aide-autres">
+          <label><input type="radio" name="aide_autres" value="1"> Oui</label>
+          <label><input type="radio" name="aide_autres" value="0"> Non</label>
+          <label><input type="radio" name="aide_autres" value="99"> Je préfère ne pas répondre</label>
+        </div>
+
+        <div class="q-num">Q19. Qui sont, selon vous, les principaux bénéficiaires ?</div>
+        <div class="q-note">Plusieurs réponses possibles.</div>
+        <div class="check-group" id="cg-beneficiaires">
+          <label><input type="checkbox" value="1"> Moi-même</label>
+          <label><input type="checkbox" value="2"> Les pêcheurs</label>
+          <label><input type="checkbox" value="3"> Une association / un groupement</label>
+          <label><input type="checkbox" value="4"> Le village</label>
+          <label><input type="checkbox" value="5"> Autre</label>
+        </div>
+        <div id="benef-autre-wrap" class="hidden">
+          <input type="text" id="beneficiaires_autre" placeholder="Précisez :">
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-default" id="btn-conn-retour">← Retour</button>
+      <button class="btn btn-success" id="btn-conn-go">Passer aux explications →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ ÉCRAN 4 : EXPLICATION -->
+<div id="s-explication" class="screen">
+  <div class="header"><h2>Explication de l'exercice</h2></div>
+  <div class="card">
+    <p style="font-size:14px;line-height:1.7;margin-bottom:12px;text-align:justify">
+      Pour accompagner la mise en place des réserves permanentes, Dahari a initié des activités
+      d'appui à la communauté et aux pêcheurs dans les villages. Parmi ces activités, on peut
+      citer les programmes d'appui en agriculture, des formations en techniques de séchage,
+      l'installation des DCP et l'octroi de frigos.
+    </p>
+    <p style="font-size:14px;line-height:1.7;margin-bottom:12px;text-align:justify">
+      Dans cette partie, nous allons vous présenter plusieurs <strong>scénarios hypothétiques</strong>
+      sur la localisation des réserves permanentes et les activités menées par Dahari dans les
+      villages. Parmi les scénarios que nous allons vous présenter, nous allons vous inviter à
+      choisir le scénario que vous préférez. Prenez le temps de regarder chaque possibilité et
+      n'hésitez pas à demander des explications si une question ou une image n'est pas claire.
+    </p>
+    <p style="font-size:14px;line-height:1.7;margin-bottom:12px;text-align:justify">
+      Pour chaque situation, vous devrez <strong>choisir le scénario que vous préférez</strong>
+      parmi deux options, ou indiquer qu'aucune des deux ne vous convient.
+    </p>
+    <div style="background:#eff6ff;padding:14px;border-radius:8px;border-left:4px solid #3b82f6;margin-bottom:14px">
+      <p style="font-size:13px;font-weight:600;margin-bottom:8px">Chaque option décrit une réserve permanente selon 4 caractéristiques :</p>
+      <ul style="font-size:13px;line-height:1.8;margin-left:16px">
+        <li>📍 <strong>Localisation</strong> : platier, crête ou au-delà de la crête</li>
+        <li>🌊 <strong>Zone tampon</strong> : présence ou absence d'une zone tampon</li>
+        <li>⏱ <strong>Temps volontaire</strong> : jours/mois consacrés à la gestion</li>
+        <li>🎁 <strong>Compensation</strong> : matériel ou infrastructure pour appuyer les pêcheurs</li>
+      </ul>
+    </div>
+    <p style="font-size:13px;font-style:italic;color:#64748b;margin-bottom:16px">
+      <strong>Il n'y a pas de bonne ou de mauvaise réponse.</strong> Nous souhaitons simplement connaître votre avis et vos préférences.
+    </p>
+    <button class="btn btn-primary" id="btn-expl-go">Commencer le choix des scénarios →</button>
+  </div>
+</div>
+
+<!-- ============================================================ ÉCRAN 5 : SCENARIOS -->
+<div id="s-scenarios" class="screen">
+  <div class="header"><h2>Quel scénario préférez-vous ?</h2></div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%">0%</div></div>
+  <div style="text-align:center;margin-bottom:12px">
+    <strong id="scenario-titre" style="color:#1e3a8a;font-size:15px">Scénario 1 sur 6</strong>
+    <p style="color:#64748b;font-size:13px;margin-top:2px">Touchez la carte de votre choix</p>
+  </div>
+  <div class="cartes-row" id="cartes-container"></div>
+  <div id="optout-followup" class="hidden optout-followup">
+    <h4>Pourquoi avez-vous choisi « Aucune de ces deux options » ?</h4>
+    <p style="font-size:13px;color:#64748b;margin-bottom:8px">Choisissez la raison principale.</p>
+    <div class="radio-group" id="rg-raison-optout">
+      <label><input type="radio" name="raison_optout" value="1"> Aucun des deux scénarios ne m'arrange</label>
+      <label><input type="radio" name="raison_optout" value="2"> Je préfère la situation actuelle</label>
+      <label><input type="radio" name="raison_optout" value="3"> Les compensations proposées sont insuffisantes</label>
+      <label><input type="radio" name="raison_optout" value="4"> Je suis opposé aux réserves permanentes</label>
+      <label><input type="radio" name="raison_optout" value="5"> Je n'ai pas confiance dans ceux qui gèrent la réserve permanente</label>
+      <label><input type="radio" name="raison_optout" value="6"> Ce n'est pas aux pêcheurs de faire des efforts</label>
+      <label><input type="radio" name="raison_optout" value="7"> Je n'ai pas bien compris les scénarios</label>
+      <label><input type="radio" name="raison_optout" value="8"> Autre raison</label>
+    </div>
+    <div id="raison-autre-wrap" class="hidden">
+      <input type="text" id="raison_optout_autre" placeholder="Précisez :">
+    </div>
+  </div>
+  <div class="btn-row" style="margin-top:10px">
+    <button class="btn btn-default" id="btn-prev">← Précédent</button>
+    <button class="btn btn-success" id="btn-next">Suivant →</button>
+  </div>
+</div>
+
+<!-- ============================================================ ÉCRAN 6 : DÉBRIEFING -->
+<div id="s-difficultes" class="screen">
+  <div class="header"><h2>Quelques questions supplémentaires</h2></div>
+  <div class="card">
+    <div class="q-num">1. Comment avez-vous trouvé la compréhension des scénarios ?</div>
+    <div class="radio-group" id="rg-diff-comp">
+      <label><input type="radio" name="diff_comprehension" value="1"> Très facile</label>
+      <label><input type="radio" name="diff_comprehension" value="2"> Facile</label>
+      <label><input type="radio" name="diff_comprehension" value="3"> Moyen</label>
+      <label><input type="radio" name="diff_comprehension" value="4"> Difficile</label>
+      <label><input type="radio" name="diff_comprehension" value="5"> Très difficile</label>
+    </div>
+    <hr class="section-sep">
+    <div class="q-num">2. Avez-vous eu des difficultés à choisir entre les options ?</div>
+    <div class="radio-group" id="rg-diff-choix">
+      <label><input type="radio" name="diff_choix" value="1"> Aucune difficulté</label>
+      <label><input type="radio" name="diff_choix" value="2"> Peu de difficultés</label>
+      <label><input type="radio" name="diff_choix" value="3"> Quelques difficultés</label>
+      <label><input type="radio" name="diff_choix" value="4"> Beaucoup de difficultés</label>
+    </div>
+    <hr class="section-sep">
+    <div class="q-num">3. Les scénarios vous semblaient-ils réalistes par rapport à votre situation ?</div>
+    <div class="radio-group" id="rg-diff-real">
+      <label><input type="radio" name="diff_realisme" value="1"> Oui, tout à fait</label>
+      <label><input type="radio" name="diff_realisme" value="2"> Plutôt oui</label>
+      <label><input type="radio" name="diff_realisme" value="3"> Plutôt non</label>
+      <label><input type="radio" name="diff_realisme" value="4"> Non, pas du tout</label>
+    </div>
+    <hr class="section-sep">
+    <div class="q-num">4. Avez-vous utilisé une stratégie particulière pour faire vos choix ?</div>
+    <div class="radio-group" id="rg-diff-strat">
+      <label><input type="radio" name="diff_strategie" value="1"> J'ai tout lu attentivement</label>
+      <label><input type="radio" name="diff_strategie" value="2"> Je me suis concentré sur 1-2 caractéristiques</label>
+      <label><input type="radio" name="diff_strategie" value="3"> J'ai souvent choisi « aucune de ces options »</label>
+      <label><input type="radio" name="diff_strategie" value="4"> J'ai choisi au hasard</label>
+    </div>
+    <hr class="section-sep">
+    <div class="q-num">5. Commentaires ou remarques libres :</div>
+    <textarea id="diff_commentaires" placeholder="Vous pouvez noter ici toute remarque sur l'enquête..."></textarea>
+    <button class="btn btn-success" id="btn-diff-go" disabled>Continuer →</button>
+  </div>
+</div>
+
+<!-- ============================================================ ÉCRAN 7 : GOUVERNANCE -->
+<div id="s-gouvernance" class="screen">
+  <div class="header"><h2>Attitudes à l'équité et à la gouvernance</h2></div>
+  <div class="info-box" style="margin-bottom:14px">
+    <p>Nous allons maintenant vous poser quelques questions sur votre opinion concernant la manière
+    dont les initiatives de conservation marine sont décidées, mises en place et gérées, ainsi que
+    sur ce que vous pensez être juste ou équitable dans ce processus.</p>
+    <p style="margin-top:6px"><strong>Il n'y a pas de bonne ou de mauvaise réponse.</strong></p>
+  </div>
+  <p style="font-weight:700;color:#1e3a8a;font-size:14px;margin-bottom:12px">Dans quelle mesure êtes-vous d'accord avec les affirmations suivantes ?</p>
+  <div class="card">
+    <div class="likert-item">
+      <div class="q-text">D1. Il est essentiel d'avoir l'implication de tous les groupes de pêcheurs du village pour la gestion marine (pas seulement les associations).</div>
+      <div class="likert-row" id="lr-gouv1">
+        <label><input type="radio" name="gouv_implication_tous" value="5"> <span>Très d'accord</span></label>
+        <label><input type="radio" name="gouv_implication_tous" value="4"> <span>D'accord</span></label>
+        <label><input type="radio" name="gouv_implication_tous" value="3"> <span>Neutre</span></label>
+        <label><input type="radio" name="gouv_implication_tous" value="2"> <span>Pas d'accord</span></label>
+        <label><input type="radio" name="gouv_implication_tous" value="1"> <span>Pas du tout d'accord</span></label>
+      </div>
+    </div>
+    <div class="likert-item">
+      <div class="q-text">D2. Tous les groupes et personnes pertinents du village sont représentés (et participent) à la prise de décision liée à la gestion marine.</div>
+      <div class="likert-row" id="lr-gouv2">
+        <label><input type="radio" name="gouv_representation" value="5"> <span>Très d'accord</span></label>
+        <label><input type="radio" name="gouv_representation" value="4"> <span>D'accord</span></label>
+        <label><input type="radio" name="gouv_representation" value="3"> <span>Neutre</span></label>
+        <label><input type="radio" name="gouv_representation" value="2"> <span>Pas d'accord</span></label>
+        <label><input type="radio" name="gouv_representation" value="1"> <span>Pas du tout d'accord</span></label>
+      </div>
+    </div>
+    <div class="likert-item">
+      <div class="q-text">D3. L'avis de tout le monde n'est pas pris en compte dans les prises de décision pendant les réunions de gestion.</div>
+      <div class="likert-row" id="lr-gouv3">
+        <label><input type="radio" name="gouv_avis_non_pris" value="5"> <span>Très d'accord</span></label>
+        <label><input type="radio" name="gouv_avis_non_pris" value="4"> <span>D'accord</span></label>
+        <label><input type="radio" name="gouv_avis_non_pris" value="3"> <span>Neutre</span></label>
+        <label><input type="radio" name="gouv_avis_non_pris" value="2"> <span>Pas d'accord</span></label>
+        <label><input type="radio" name="gouv_avis_non_pris" value="1"> <span>Pas du tout d'accord</span></label>
+      </div>
+    </div>
+    <div class="likert-item">
+      <div class="q-text">D4. L'application des règles de gestion de la pêche ou de la mer est la même pour tout le monde.</div>
+      <div class="likert-row" id="lr-gouv4">
+        <label><input type="radio" name="gouv_regles_egales" value="5"> <span>Très d'accord</span></label>
+        <label><input type="radio" name="gouv_regles_egales" value="4"> <span>D'accord</span></label>
+        <label><input type="radio" name="gouv_regles_egales" value="3"> <span>Neutre</span></label>
+        <label><input type="radio" name="gouv_regles_egales" value="2"> <span>Pas d'accord</span></label>
+        <label><input type="radio" name="gouv_regles_egales" value="1"> <span>Pas du tout d'accord</span></label>
+      </div>
+    </div>
+    <div class="likert-item">
+      <div class="q-text">D5. Les femmes ne devraient pas être impliquées dans la prise de décisions sur la gestion de la pêche.</div>
+      <div class="likert-row" id="lr-gouv5">
+        <label><input type="radio" name="gouv_femmes_exclues" value="5"> <span>Très d'accord</span></label>
+        <label><input type="radio" name="gouv_femmes_exclues" value="4"> <span>D'accord</span></label>
+        <label><input type="radio" name="gouv_femmes_exclues" value="3"> <span>Neutre</span></label>
+        <label><input type="radio" name="gouv_femmes_exclues" value="2"> <span>Pas d'accord</span></label>
+        <label><input type="radio" name="gouv_femmes_exclues" value="1"> <span>Pas du tout d'accord</span></label>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-default" id="btn-gouv-retour">← Retour</button>
+      <button class="btn btn-success" id="btn-gouv-go">Terminer et enregistrer ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ ÉCRAN 8 : MERCI -->
+<div id="s-merci" class="screen">
+  <div class="merci-box">
+    <div class="big-check">✅</div>
+    <h3>Merci pour votre participation !</h3>
+    <p style="margin-bottom:10px;color:#475569">L'enquête a été enregistrée avec succès.</p>
+    <p style="margin-bottom:20px;font-size:13px;color:#64748b">Vos réponses contribueront à améliorer la gestion et la co-construction des réserves permanentes.</p>
+    <p style="font-style:italic;font-size:13px;color:#64748b;margin-bottom:24px">Vous pouvez maintenant remettre la tablette à l'enquêteur.</p>
+    <button class="btn btn-primary" id="btn-export" style="max-width:400px;margin:0 auto 10px">📥 Exporter les données CSV</button>
+    <button class="btn btn-default" id="btn-reload" style="max-width:400px;margin:0 auto">Commencer une nouvelle enquête</button>
+  </div>
+</div>
+
+<!-- ================================================================ JAVASCRIPT -->
+<script>
+// ─── DESIGN DCE_F (36 lignes, 2 blocs de 6 sets) ────────────────────────────
+const POOL = [
+  // Bloc 1
+  {s:3,b:1,alt:"A",loc:"Platier",zt:"Absence",tv:6,comp:"Fourniture scolaire"},
+  {s:3,b:1,alt:"B",loc:"Crête",zt:"Présence",tv:0,comp:"Aucune"},
+  {s:3,b:1,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:4,b:1,alt:"A",loc:"Au-delà de la crête",zt:"Présence",tv:6,comp:"Fourniture scolaire"},
+  {s:4,b:1,alt:"B",loc:"Crête",zt:"Absence",tv:0,comp:"Hangar public"},
+  {s:4,b:1,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:8,b:1,alt:"A",loc:"Platier",zt:"Présence",tv:0,comp:"Aucune"},
+  {s:8,b:1,alt:"B",loc:"Au-delà de la crête",zt:"Absence",tv:6,comp:"Frigo"},
+  {s:8,b:1,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:10,b:1,alt:"A",loc:"Au-delà de la crête",zt:"Absence",tv:6,comp:"Aucune"},
+  {s:10,b:1,alt:"B",loc:"Crête",zt:"Présence",tv:0,comp:"Frigo"},
+  {s:10,b:1,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:11,b:1,alt:"A",loc:"Crête",zt:"Absence",tv:6,comp:"Hangar public"},
+  {s:11,b:1,alt:"B",loc:"Platier",zt:"Présence",tv:0,comp:"Frigo"},
+  {s:11,b:1,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:12,b:1,alt:"A",loc:"Au-delà de la crête",zt:"Présence",tv:6,comp:"Hangar public"},
+  {s:12,b:1,alt:"B",loc:"Platier",zt:"Absence",tv:0,comp:"Fourniture scolaire"},
+  {s:12,b:1,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  // Bloc 2
+  {s:1,b:2,alt:"A",loc:"Crête",zt:"Présence",tv:6,comp:"Fourniture scolaire"},
+  {s:1,b:2,alt:"B",loc:"Au-delà de la crête",zt:"Absence",tv:0,comp:"Frigo"},
+  {s:1,b:2,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:2,b:2,alt:"A",loc:"Au-delà de la crête",zt:"Absence",tv:0,comp:"Aucune"},
+  {s:2,b:2,alt:"B",loc:"Platier",zt:"Présence",tv:6,comp:"Hangar public"},
+  {s:2,b:2,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:5,b:2,alt:"A",loc:"Platier",zt:"Absence",tv:6,comp:"Frigo"},
+  {s:5,b:2,alt:"B",loc:"Au-delà de la crête",zt:"Présence",tv:0,comp:"Fourniture scolaire"},
+  {s:5,b:2,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:6,b:2,alt:"A",loc:"Au-delà de la crête",zt:"Présence",tv:0,comp:"Hangar public"},
+  {s:6,b:2,alt:"B",loc:"Crête",zt:"Absence",tv:6,comp:"Aucune"},
+  {s:6,b:2,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:7,b:2,alt:"A",loc:"Platier",zt:"Absence",tv:0,comp:"Hangar public"},
+  {s:7,b:2,alt:"B",loc:"Crête",zt:"Présence",tv:6,comp:"Frigo"},
+  {s:7,b:2,alt:"OptOut",loc:null,zt:null,tv:null,comp:null},
+  {s:9,b:2,alt:"A",loc:"Platier",zt:"Présence",tv:6,comp:"Aucune"},
+  {s:9,b:2,alt:"B",loc:"Crête",zt:"Absence",tv:0,comp:"Fourniture scolaire"},
+  {s:9,b:2,alt:"OptOut",loc:null,zt:null,tv:null,comp:null}
+];
+
+// Images par attribut/valeur
+const IMG = {
+  loc: {"Platier":"platier.png","Crête":"crete.png","Au-delà de la crête":"au_dela.png"},
+  zt:  {"Absence":"tampon_absence.png","Présence":"tampon_presence.png"},
+  tv:  {0:"0hh.png",2:"2hh.png",4:"4hh.png",6:"6hh.png"},
+  comp:{"Aucune":"comp_aucune.png","Frigo":"frigo.png","Fourniture scolaire":"fournitures.png","Hangar public":"hangar.png"}
+};
+
+// ─── ÉTAT APPLICATION ────────────────────────────────────────────────────────
+let bloc_id, bloc_sets, current_task_idx, reponses, raisons;
+// reponses[set_id] = "A"|"B"|"OptOut"
+// raisons[set_id]  = {code, autre}
+
+function shuffleArray(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function initBloc(){
+  bloc_id = Math.random()<.5 ? 1 : 2;
+  const sets = [...new Set(POOL.filter(r=>r.b===bloc_id).map(r=>r.s))];
+  bloc_sets = shuffleArray(sets); // 6 sets in random order
+  current_task_idx = 0;
+  reponses = {};
+  raisons  = {};
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ─── HELPER ──────────────────────────────────────────────────────────────────
+function notif(msg,dur=4000){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.style.display='block';
+  setTimeout(()=>n.style.display='none',dur);
+}
+function getRadio(name){const r=document.querySelector(`input[name="${name}"]:checked`);return r?r.value:null;}
+function getChecks(containerId){return [...document.querySelectorAll(`#${containerId} input[type=checkbox]:checked`)].map(c=>c.value);}
+function isEmpty(v){return v===null||v===undefined||v===''||(Array.isArray(v)&&v.length===0);}
+
+// ─── ÉCRAN 1 : INTRO ─────────────────────────────────────────────────────────
+document.getElementById('consent').addEventListener('change',function(){
+  document.getElementById('btn-intro-go').disabled=!this.checked;
+});
+document.getElementById('btn-intro-go').addEventListener('click',()=>showScreen('s-sociodem'));
+
+// ─── RADIO / CHECKBOX STYLE ──────────────────────────────────────────────────
+document.addEventListener('change', e=>{
+  if(e.target.type==='radio'){
+    const grp=e.target.closest('.radio-group, .likert-row');
+    if(grp){grp.querySelectorAll('label').forEach(l=>l.classList.remove('selected'));
+    e.target.closest('label').classList.add('selected');}
+  }
+  if(e.target.type==='checkbox'){
+    const lbl=e.target.closest('label');
+    if(lbl) lbl.classList.toggle('checked',e.target.checked);
+  }
+});
+
+// ─── CONDITIONNELS SOCIODEM ───────────────────────────────────────────────────
+function watchRadio(name,valeur,wrapId){
+  document.addEventListener('change',e=>{
+    if(e.target.name===name){
+      const show=e.target.value===valeur;
+      document.getElementById(wrapId).classList.toggle('hidden',!show);
+    }
+  });
+}
+function watchCheck(containerId,valeur,wrapId){
+  document.getElementById(containerId).addEventListener('change',()=>{
+    const checked=getChecks(containerId);
+    document.getElementById(wrapId).classList.toggle('hidden',!checked.includes(valeur));
+  });
+}
+watchRadio('activite_principale','6','act-princ-autre-wrap');
+watchRadio('activite_secondaire','6','act-sec-autre-wrap');
+watchCheck('cg-type-peche','5','type-peche-autre-wrap');
+watchCheck('cg-techniques','9','techniques-autre-wrap');
+watchCheck('cg-zones','4','zones-autre-wrap');
+watchRadio('zone_principale','4','zone-princ-autre-wrap');
+
+// ─── VALIDATION SOCIODEM ──────────────────────────────────────────────────────
+document.getElementById('btn-sociodem-go').addEventListener('click',()=>{
+  const errors=[];
+  if(!document.getElementById('enqueteur').value.trim()) errors.push("Nom de l'enquêteur");
+  if(!document.getElementById('pecheur').value.trim()) errors.push("ID pêcheur");
+  if(!document.getElementById('village').value) errors.push("Q1 village");
+  const age=parseInt(document.getElementById('age').value);
+  if(isNaN(age)||age<15||age>100) errors.push("Q2 âge (15–100)");
+  if(!getRadio('genre')) errors.push("Q3 genre");
+  if(!getRadio('education')) errors.push("Q4 éducation");
+  const tm=parseInt(document.getElementById('taille_menage').value);
+  if(isNaN(tm)||tm<1) errors.push("Q5 taille ménage");
+  const ap=getRadio('activite_principale');
+  if(!ap) errors.push("Q6 activité principale");
+  else if(ap==='6'&&!document.getElementById('activite_principale_autre').value.trim()) errors.push("Q6 préciser Autre");
+  const as=getRadio('activite_secondaire');
+  if(!as) errors.push("Q7 activité secondaire");
+  else if(as==='6'&&!document.getElementById('activite_secondaire_autre').value.trim()) errors.push("Q7 préciser Autre");
+  const tp=getChecks('cg-type-peche');
+  if(!tp.length) errors.push("Q8 type de pêche");
+  else if(tp.includes('5')&&!document.getElementById('type_peche_autre').value.trim()) errors.push("Q8 préciser Autre");
+  const tq=getChecks('cg-techniques');
+  if(!tq.length) errors.push("Q9 techniques");
+  else if(tq.includes('9')&&!document.getElementById('techniques_peche_autre').value.trim()) errors.push("Q9 préciser Autre");
+  const zp=getChecks('cg-zones');
+  if(!zp.length) errors.push("Q10 zones");
+  else if(zp.includes('4')&&!document.getElementById('zones_peche_autre').value.trim()) errors.push("Q10 préciser Autre");
+  const zprinc=getRadio('zone_principale');
+  if(!zprinc) errors.push("Q11 zone principale");
+  else if(zprinc==='4'&&!document.getElementById('zone_principale_autre').value.trim()) errors.push("Q11 préciser Autre");
+  if(errors.length){notif("⚠ À compléter : "+errors.join(', '),7000);return;}
+  showScreen('s-connaissance');
+});
+
+// ─── CONDITIONNELS CONNAISSANCE ───────────────────────────────────────────────
+document.addEventListener('change',e=>{
+  if(e.target.name==='connait_assoc'){
+    document.getElementById('assoc-detail').classList.toggle('hidden',e.target.value!=='1');
+  }
+  if(e.target.name==='aide_recue'){
+    document.getElementById('aide-detail').classList.toggle('hidden',e.target.value!=='1');
+  }
+});
+document.getElementById('cg-associations').addEventListener('change',()=>{
+  const c=getChecks('cg-associations');
+  document.getElementById('assoc-autre-wrap').classList.toggle('hidden',!c.includes('12'));
+});
+document.getElementById('cg-aides-types').addEventListener('change',()=>{
+  const c=getChecks('cg-aides-types');
+  document.getElementById('aides-autre-wrap').classList.toggle('hidden',!c.includes('5'));
+  [1,2,3,4,5].forEach(k=>document.getElementById(`source-aide-${k}`).classList.toggle('hidden',!c.includes(String(k))));
+});
+document.getElementById('cg-beneficiaires').addEventListener('change',()=>{
+  const c=getChecks('cg-beneficiaires');
+  document.getElementById('benef-autre-wrap').classList.toggle('hidden',!c.includes('5'));
+});
+
+// ─── VALIDATION CONNAISSANCE ──────────────────────────────────────────────────
+document.getElementById('btn-conn-retour').addEventListener('click',()=>showScreen('s-sociodem'));
+document.getElementById('btn-conn-go').addEventListener('click',()=>{
+  const errors=[];
+  if(!getRadio('connait_dahari')) errors.push("Q12");
+  if(!getRadio('participe_dahari')) errors.push("Q13");
+  const ca=getRadio('connait_assoc');
+  if(!ca) errors.push("Q14");
+  else if(ca==='1'){
+    const as=getChecks('cg-associations');
+    if(!as.length) errors.push("Q14 associations");
+    else if(as.includes('12')&&!document.getElementById('associations_autre').value.trim()) errors.push("Q14 préciser Autre");
+  }
+  if(!getRadio('connait_aide')) errors.push("Q15");
+  const ar=getRadio('aide_recue');
+  if(!ar) errors.push("Q16");
+  else if(ar==='1'){
+    const at=getChecks('cg-aides-types');
+    if(!at.length) errors.push("Q16 types d'aide");
+    else{
+      at.forEach(k=>{if(!getRadio(`source_aide_${k}`)) errors.push(`Q16 source aide ${k}`);});
+      if(at.includes('5')&&!document.getElementById('aides_types_autre').value.trim()) errors.push("Q16 préciser Autre");
+    }
+    if(!getRadio('derniere_aide')) errors.push("Q17");
+    if(!getRadio('aide_autres')) errors.push("Q18");
+    const ben=getChecks('cg-beneficiaires');
+    if(!ben.length) errors.push("Q19");
+    else if(ben.includes('5')&&!document.getElementById('beneficiaires_autre').value.trim()) errors.push("Q19 préciser Autre");
+  }
+  if(errors.length){notif("⚠ À compléter : "+errors.join(', '),7000);return;}
+  showScreen('s-explication');
+});
+
+// ─── EXPLICATION ─────────────────────────────────────────────────────────────
+document.getElementById('btn-expl-go').addEventListener('click',()=>{
+  initBloc();
+  renderScenario();
+  showScreen('s-scenarios');
+});
+
+// ─── SCÉNARIOS DCE ───────────────────────────────────────────────────────────
+function tvLabel(v){return v===0?'Aucun jour/mois':`${v} jour${v>1?'s':''}/mois`;}
+
+function attrBlock(emoji,label,imgKey,imgVal,textVal){
+  const imgFile = IMG[imgKey]?.[imgVal];
+  const imgTag = imgFile
+    ? `<img class="attr-img" src="images/${imgFile}" onerror="this.style.display='none'" alt="${textVal}">`
+    : '';
+  return `<div class="attr-block">
+    <div class="attr-name">${emoji} ${label}</div>
+    ${imgTag}
+    <div class="attr-val">${textVal}</div>
+  </div>`;
+}
+
+function renderScenario(){
+  const set_id = bloc_sets[current_task_idx];
+  const rows   = POOL.filter(r=>r.s===set_id && r.b===bloc_id);
+  const n      = bloc_sets.length; // 6
+  const idx    = current_task_idx+1;
+
+  // Progress
+  const pct = Math.round((current_task_idx/n)*100);
+  document.getElementById('progress-bar').style.width=pct+'%';
+  document.getElementById('progress-bar').textContent=pct+'%';
+  document.getElementById('scenario-titre').textContent=`Scénario ${idx} sur ${n}`;
+  document.getElementById('btn-next').textContent = idx===n ? 'Terminer ✓' : 'Suivant →';
+  document.getElementById('btn-prev').disabled = current_task_idx===0;
+
+  const choix = reponses[set_id] || null;
+
+  // Build cards
+  const container = document.getElementById('cartes-container');
+  container.innerHTML = rows.map(row=>{
+    const selected = choix===row.alt ? ' selected':'';
+    if(row.alt==='OptOut'){
+      return `<div class="carte opt-out${selected}" data-alt="OptOut" data-set="${set_id}" onclick="selectAlt(this)">
+        <div class="opt-out-inner">
+          <span class="big-icon">🚫</span>
+          <h4>Aucune de ces deux options</h4>
+          <p>Aucun des deux scénarios ne me convient.</p>
+        </div>
+      </div>`;
+    }
+    return `<div class="carte${selected}" data-alt="${row.alt}" data-set="${set_id}" onclick="selectAlt(this)">
+      <div class="alt-title">OPTION ${row.alt}</div>
+      ${attrBlock('📍','Localisation','loc',row.loc,row.loc)}
+      ${attrBlock('🌊','Zone tampon','zt',row.zt,row.zt)}
+      ${attrBlock('⏱','Temps volontaire','tv',row.tv,tvLabel(row.tv))}
+      ${attrBlock('🎁','Compensation','comp',row.comp,row.comp==='Aucune'?'Aucune compensation':row.comp)}
+    </div>`;
+  }).join('');
+
+  // OptOut followup
+  const followup=document.getElementById('optout-followup');
+  if(choix==='OptOut'){
+    followup.classList.remove('hidden');
+    // Restore saved raison if any
+    const r=raisons[set_id];
+    if(r){
+      const rb=document.querySelector(`input[name="raison_optout"][value="${r.code}"]`);
+      if(rb){rb.checked=true;rb.closest('label').classList.add('selected');}
+      if(r.code==='8'){
+        document.getElementById('raison-autre-wrap').classList.remove('hidden');
+        document.getElementById('raison_optout_autre').value=r.autre||'';
+      }
+    }
+  } else {
+    followup.classList.add('hidden');
+    // Reset raison radios
+    document.querySelectorAll('input[name="raison_optout"]').forEach(r=>{r.checked=false;r.closest('label').classList.remove('selected');});
+    document.getElementById('raison-autre-wrap').classList.add('hidden');
+    document.getElementById('raison_optout_autre').value='';
+  }
+}
+
+function selectAlt(el){
+  const set_id=parseInt(el.dataset.set);
+  const alt=el.dataset.alt;
+  reponses[set_id]=alt;
+
+  // Highlight
+  document.querySelectorAll('#cartes-container .carte').forEach(c=>{
+    c.classList.toggle('selected',c.dataset.alt===alt);
+  });
+
+  const followup=document.getElementById('optout-followup');
+  if(alt==='OptOut'){
+    followup.classList.remove('hidden');
+    setTimeout(()=>followup.scrollIntoView({behavior:'smooth'}),200);
+  } else {
+    followup.classList.add('hidden');
+    delete raisons[set_id];
+    document.querySelectorAll('input[name="raison_optout"]').forEach(r=>{r.checked=false;r.closest('label').classList.remove('selected');});
+    document.getElementById('raison-autre-wrap').classList.add('hidden');
+    document.getElementById('raison_optout_autre').value='';
+  }
+}
+
+// Watch raison_optout radio
+document.getElementById('rg-raison-optout').addEventListener('change',e=>{
+  const set_id=bloc_sets[current_task_idx];
+  const code=e.target.value;
+  const autre=document.getElementById('raison_optout_autre').value;
+  raisons[set_id]={code,autre};
+  document.getElementById('raison-autre-wrap').classList.toggle('hidden',code!=='8');
+});
+document.getElementById('raison_optout_autre').addEventListener('input',e=>{
+  const set_id=bloc_sets[current_task_idx];
+  if(raisons[set_id]) raisons[set_id].autre=e.target.value;
+});
+
+document.getElementById('btn-prev').addEventListener('click',()=>{
+  if(current_task_idx>0){current_task_idx--;renderScenario();}
+});
+document.getElementById('btn-next').addEventListener('click',()=>{
+  const set_id=bloc_sets[current_task_idx];
+  if(!reponses[set_id]){notif("⚠ Merci de choisir une option avant de continuer.");return;}
+  if(reponses[set_id]==='OptOut'){
+    const r=raisons[set_id];
+    if(!r||!r.code){notif("⚠ Merci d'indiquer pourquoi vous n'avez choisi aucune option.");return;}
+    if(r.code==='8'&&!r.autre.trim()){notif("⚠ Merci de préciser l'autre raison.");return;}
+  }
+  if(current_task_idx<bloc_sets.length-1){current_task_idx++;renderScenario();}
+  else showScreen('s-difficultes');
+});
+
+// ─── DÉBRIEFING ───────────────────────────────────────────────────────────────
+function checkDiff(){
+  const ok=['diff_comprehension','diff_choix','diff_realisme','diff_strategie'].every(n=>getRadio(n));
+  document.getElementById('btn-diff-go').disabled=!ok;
+}
+document.querySelectorAll('input[name="diff_comprehension"],input[name="diff_choix"],input[name="diff_realisme"],input[name="diff_strategie"]')
+  .forEach(r=>r.addEventListener('change',checkDiff));
+document.getElementById('btn-diff-go').addEventListener('click',()=>showScreen('s-gouvernance'));
+
+// Likert labels
+document.querySelectorAll('.likert-row').forEach(row=>{
+  row.addEventListener('change',e=>{
+    row.querySelectorAll('label').forEach(l=>l.classList.toggle('selected',l.contains(e.target)&&e.target.checked));
+  });
+});
+
+// ─── GOUVERNANCE + SAVE ───────────────────────────────────────────────────────
+document.getElementById('btn-gouv-retour').addEventListener('click',()=>showScreen('s-difficultes'));
+document.getElementById('btn-gouv-go').addEventListener('click',()=>{
+  const gouv_fields=['gouv_implication_tous','gouv_representation','gouv_avis_non_pris','gouv_regles_egales','gouv_femmes_exclues'];
+  const missing=gouv_fields.filter(f=>!getRadio(f)).map((_,i)=>`D${i+1}`);
+  if(missing.length){notif("⚠ À compléter : "+missing.join(', '),5000);return;}
+  saveData();
+  showScreen('s-merci');
+});
+
+function buildRows(){
+  const now=new Date().toISOString().replace('T',' ').substring(0,19);
+  const id_rep=document.getElementById('pecheur').value.trim();
+  const enqueteur=document.getElementById('enqueteur').value.trim();
+
+  // Socio
+  const socio={
+    village: document.getElementById('village').value,
+    age: document.getElementById('age').value,
+    genre: getRadio('genre'),
+    education: getRadio('education'),
+    taille_menage: document.getElementById('taille_menage').value,
+    activite_principale: getRadio('activite_principale'),
+    activite_principale_autre: document.getElementById('activite_principale_autre').value.trim()||null,
+    activite_secondaire: getRadio('activite_secondaire'),
+    activite_secondaire_autre: document.getElementById('activite_secondaire_autre').value.trim()||null,
+    type_peche: getChecks('cg-type-peche').join(';')||null,
+    type_peche_autre: document.getElementById('type_peche_autre').value.trim()||null,
+    techniques_peche: getChecks('cg-techniques').join(';')||null,
+    techniques_peche_autre: document.getElementById('techniques_peche_autre').value.trim()||null,
+    zones_peche: getChecks('cg-zones').join(';')||null,
+    zones_peche_autre: document.getElementById('zones_peche_autre').value.trim()||null,
+    zone_principale: getRadio('zone_principale'),
+    zone_principale_autre: document.getElementById('zone_principale_autre').value.trim()||null
+  };
+
+  // Section B
+  const assocOui=getRadio('connait_assoc')==='1';
+  const aideOui=getRadio('aide_recue')==='1';
+  const aidesTypes=aideOui?getChecks('cg-aides-types'):[];
+  const sectionB={
+    connait_dahari: getRadio('connait_dahari'),
+    participe_dahari: getRadio('participe_dahari'),
+    connait_assoc: getRadio('connait_assoc'),
+    associations: assocOui?getChecks('cg-associations').join(';')||null:null,
+    associations_autre: assocOui&&document.getElementById('associations_autre').value.trim()||null,
+    connait_aide: getRadio('connait_aide'),
+    aide_recue: getRadio('aide_recue'),
+    aides_types: aideOui?aidesTypes.join(';')||null:null,
+    aides_types_autre: aideOui&&document.getElementById('aides_types_autre').value.trim()||null,
+    source_aide_agri: aideOui&&aidesTypes.includes('1')?getRadio('source_aide_1'):null,
+    source_aide_sechage: aideOui&&aidesTypes.includes('2')?getRadio('source_aide_2'):null,
+    source_aide_frigo: aideOui&&aidesTypes.includes('3')?getRadio('source_aide_3'):null,
+    source_aide_argent: aideOui&&aidesTypes.includes('4')?getRadio('source_aide_4'):null,
+    source_aide_autre_src: aideOui&&aidesTypes.includes('5')?getRadio('source_aide_5'):null,
+    derniere_aide: aideOui?getRadio('derniere_aide'):null,
+    aide_autres: aideOui?getRadio('aide_autres'):null,
+    beneficiaires: aideOui?getChecks('cg-beneficiaires').join(';')||null:null,
+    beneficiaires_autre: aideOui&&document.getElementById('beneficiaires_autre').value.trim()||null
+  };
+
+  // Gouvernance
+  const gouv={
+    gouv_implication_tous: getRadio('gouv_implication_tous'),
+    gouv_representation: getRadio('gouv_representation'),
+    gouv_avis_non_pris: getRadio('gouv_avis_non_pris'),
+    gouv_regles_egales: getRadio('gouv_regles_egales'),
+    gouv_femmes_exclues: getRadio('gouv_femmes_exclues')
+  };
+
+  // Debrief
+  const debrief={
+    diff_comprehension: getRadio('diff_comprehension'),
+    diff_choix: getRadio('diff_choix'),
+    diff_realisme: getRadio('diff_realisme'),
+    diff_strategie: getRadio('diff_strategie'),
+    diff_commentaires: document.getElementById('diff_commentaires').value.trim()||null
+  };
+
+  const TYPE_RAISON={"1":"vrai_zero","2":"vrai_zero","3":"vrai_zero","4":"protestation","5":"protestation","6":"protestation","7":"incomprehension","8":"a_classer"};
+
+  // Build one row per alternative
+  const rows=[];
+  bloc_sets.forEach((set_id,task_idx)=>{
+    const alt_choisie=reponses[set_id];
+    const r=raisons[set_id]||{};
+    POOL.filter(p=>p.s===set_id&&p.b===bloc_id).forEach(row=>{
+      rows.push({
+        timestamp: now,
+        id_repondant: id_rep,
+        enqueteur: enqueteur,
+        ...socio,
+        ...sectionB,
+        bloc: bloc_id,
+        tache: task_idx+1,
+        ensemble_choix: set_id,
+        alternative: row.alt,
+        choix: row.alt===alt_choisie?1:0,
+        raison_optout: row.alt==='OptOut'&&alt_choisie==='OptOut'?r.code||null:null,
+        raison_optout_autre: row.alt==='OptOut'&&alt_choisie==='OptOut'&&r.code==='8'?r.autre||null:null,
+        type_optout: row.alt==='OptOut'&&alt_choisie==='OptOut'?TYPE_RAISON[r.code]||null:null,
+        localisation: row.loc,
+        zone_tampon: row.zt,
+        temps_volontaire: row.tv,
+        compensation: row.comp,
+        ...debrief,
+        ...gouv
+      });
+    });
+  });
+  return rows;
+}
+
+function saveData(){
+  const rows=buildRows();
+  let existing=[];
+  try{existing=JSON.parse(localStorage.getItem('dce_f_data')||'[]');}catch(e){}
+  existing.push(...rows);
+  try{localStorage.setItem('dce_f_data',JSON.stringify(existing));}catch(e){console.warn('localStorage error',e);}
+}
+
+// ─── EXPORT CSV ──────────────────────────────────────────────────────────────
+document.getElementById('btn-export').addEventListener('click',exportCSV);
+function exportCSV(){
+  let all=[];
+  try{all=JSON.parse(localStorage.getItem('dce_f_data')||'[]');}catch(e){}
+  if(!all.length){notif("Aucune donnée à exporter.",3000);return;}
+  const keys=Object.keys(all[0]);
+  const escape=v=>{
+    if(v===null||v===undefined)return '';
+    const s=String(v);
+    if(s.includes(',')||s.includes('"')||s.includes('\n'))return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  };
+  const csv='﻿'+[keys.join(','),...all.map(row=>keys.map(k=>escape(row[k])).join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const d=new Date().toISOString().replace(/[:.]/g,'-').substring(0,16);
+  a.download=`DCE_F_DAHARI_${d}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── RELOAD ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-reload').addEventListener('click',()=>location.reload());
+
+// ─── SERVICE WORKER ──────────────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(r=>console.log('SW registered',r.scope)).catch(e=>console.warn('SW failed',e));
+}
+</script>
+</body>
+</html>
